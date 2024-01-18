@@ -32,7 +32,7 @@ class SUS extends Client {
     this.commandCooldown = new Discord.Collection();
     this.categories = fs.readdirSync("./commands");
     this.temp = new Collection();
-    this.config = require("../config");
+    this.config = require("../settings/config");
   }
 
   start(token) {

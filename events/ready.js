@@ -9,4 +9,5 @@ client.on("ready", async () => {
     });
 
     await require("../handlers/database")(client);
+    await client.active.delete(client.active.all)
 });  

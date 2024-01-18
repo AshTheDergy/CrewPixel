@@ -5,21 +5,21 @@
 
 // Imports
 const { readdirSync } = require("fs");
-const { ApplicationCommandType } = require("discord.js");
+const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 
 /**
- * @param {PH} client
+ * @param {SUS} client
  */
 module.exports = async (client) => {
 
     try {
         let allCommands = [];
-        const commands = readdirSync(`/commands/${dir}`).filter((f) =>
+        const commands = readdirSync(`./commands/`).filter((f) =>
             f.endsWith(".js")
         );
 
         for (const cmd of commands) {
-            const command = require(`./commands/${cmd}`);
+            const command = require(`../commands/${cmd}`);
             if (command.name) {
                 command.type = ApplicationCommandType.ChatInput;
                 client.commands.set(command.name, command);

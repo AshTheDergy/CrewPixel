@@ -7,9 +7,18 @@ const provider = require("@joshdb/json");
  */
 module.exports = async (client) => {
 
-    client.all = new Josh({
-        name: "all",
+    client.active = new Josh({
+        name: "active",
         provider: provider,
+        providerOptions: {
+            dataDir: "./settings/data/"
+        }
     });
 
+    client.on("guildDelete", async (guild) => {
+        if (!guild) return;
+        let server = await client.active.get(guild.id);
+        if (!server) return;
+        await client.active.delete(guild.id);
+    });
 };
