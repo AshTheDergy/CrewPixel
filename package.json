@@ -1,6 +1,6 @@
 {
   "name": "crewpixel",
-  "version": "0.1",
+  "version": "1.0",
   "description": "Impostor among us",
   "main": "index.js",
   "scripts": {
