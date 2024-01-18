@@ -4,10 +4,10 @@ Project is under MIT License and is allowed to use for yourself (crediting me is
 
 ## Private use
 
-> Install the files
-> Run `npm i` in the terminal
-> Add whitelisted roles in `settings/config.js`
-> Run the bot with node .
-> Enjoy!
+- Install the files
+- Run `npm i` in the terminal
+- Add whitelisted roles in `settings/config.js`
+- Run the bot with node .
+- Enjoy!
 
 NB! The strings in few commands were made for the Furcade discord server.. soo ig you can change them :3
