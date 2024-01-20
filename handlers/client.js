@@ -14,6 +14,7 @@ class SUS extends Client {
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates,
       ],
       shards: "auto",
       failIfNotExists: false,
@@ -27,6 +28,7 @@ class SUS extends Client {
 
     this.events = new Collection();
     this.cooldowns = new Collection();
+    this.vcState = new Map()
     this.commands = new Collection();
     this.aliases = new Collection();
     this.commandCooldown = new Discord.Collection();

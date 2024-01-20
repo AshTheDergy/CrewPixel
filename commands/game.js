@@ -40,16 +40,32 @@ module.exports = {
             name: "end",
             description: "End an among us event",
             type: 1, 
+            options: [
+                {
+                    name: "event",
+                    description: "Select which event to end",
+                    type: 7,
+                    channel_types: [2],
+                    required: true,
+                }
+            ],
         },
         {
             name: "master",
-            description: "Select more game masters for the currently active event",
+            description: "Select more game masters for the currently active event(s)",
             type: 1,
             options: [
                 {
                     name: "user",
                     description: "Select a user to add to the list",
                     type: 6,
+                    required: true,
+                },
+                {
+                    name: "event",
+                    description: "Select which event to end",
+                    type: 7,
+                    channel_types: [2],
                     required: true,
                 }
             ],
@@ -62,50 +78,55 @@ module.exports = {
     */
 
     run: async (client, interaction) => {
-        
+        await interaction.deferReply({ ephemeral: true }).catch(/* GRACEFAIL */);
         const subcommand = interaction.options.getSubcommand();
 
         switch (subcommand) {
             case "start":
+                var gameCode = interaction.options.getString("code");
+                var voiceChannel = interaction.options.getChannel("vc");
+                var master = interaction.options.getUser("master");
+                var correctCode = /^[a-zA-Z]{6}$/;
 
-                const gameCode = interaction.options.getString("code");
-                const voiceChannel = interaction.options.getChannel("vc");
-                const master = interaction.options.getUser("master");
-                const correctCode = /^[a-zA-Z]{6}$/;
-
-                if (await client.active.get(interaction.guildId)) {
-                    interaction.reply({ content: `There is already an active event. Use \`/game end\` to end the event.`, ephemeral: true });
+                if (await client.active.get(`${interaction.guildId}.${voiceChannel.id}`)) {
+                    interaction.followUp({ content: `There is already an active event in this channel. Use \`/game end\` to end the event.`, ephemeral: true });
                 } else if (correctCode.test(gameCode)) {
-                    const data = {
+                    var data = {
                         code: gameCode.toUpperCase(),
                         vc: voiceChannel.id,
                         masters: {
                             role: client.config.whiteList,
                             member: [],
-                        },
+                        }
                     }
                     if (master) data.masters.member = [master.id];
-                    await client.active.set(interaction.guildId, data);
-                    interaction.reply({ content: `Event started with code \`${gameCode.toUpperCase()}\`\nGame master: ${master ? `\`${master.username}\`` + ", `Event staff`, `Admins`" : "`Event staff`, `Admins`"}`, ephemeral: true }); //for discord.gg/furcade
+                    client.active.set(`${interaction.guild.id}.${voiceChannel.id}`, data);
+                    await voiceChannel.setName(`[mogus] ${voiceChannel.name}`);
+                    await voiceChannel.setUserLimit(15);
+                    interaction.followUp({ content: `Event started with code \`${gameCode.toUpperCase()}\`\nGame master: ${master ? `\`${master.username}\`` + ", `Event staff`, `Admins`" : "`Event staff`, `Admins`"}\nVC: <#${voiceChannel.id}>`, ephemeral: true }); //for discord.gg/furcade
                 } else {
-                    interaction.reply({ content: `${gameCode} is not a valid code.`, ephemeral: true });
+                    interaction.followUp({ content: `${gameCode} is not a valid code.`, ephemeral: true });
                 }
                 break;
             case "end":
-                if (await client.active.get(interaction.guildId)) {
-                    client.active.delete(interaction.guildId);
-                    interaction.reply({ content: `Event has been ended.`, ephemeral: true });
+                var event = interaction.options.getChannel("event");
+                if (await client.active.get(`${interaction.guildId}.${event.id}`)) {
+                    client.active.delete(`${interaction.guildId}.${event.id}`);
+                    await event.setName(event.name.replace('[mogus]', ''));
+                    await event.setUserLimit(0);
+                    interaction.followUp({ content: `Event has been ended.`, ephemeral: true });
                 } else {
-                    interaction.reply({ content: `There are no active events.`, ephemeral: true });
+                    interaction.followUp({ content: `There are no active events in this channel.`, ephemeral: true });
                 }
                 break;
             case "master":
-                const user = interaction.options.getUser("user")
-                if (!client.active.get(interaction.guildId)) {
-                    interaction.reply({ content: `There are no active events.`, ephemeral: true });
+                var user = interaction.options.getUser("user");
+                var event = interaction.options.getChannel("event");
+                if (!client.active.get(`${interaction.guildId}.${event.id}`)) {
+                    interaction.followUp({ content: `There are no active events in this channel.`, ephemeral: true });
                 } else {
-                    client.active.push(`${interaction.guildId}.masters.member`, interaction.user.id);
-                    interaction.reply({ content: `User ${user} has been added to the game masters.`, ephemeral: true });
+                    client.active.push(`${interaction.guildId}.${event.id}.masters.member`, interaction.user.id);
+                    interaction.followUp({ content: `User ${user} has been added to the game masters.`, ephemeral: true });
                 }
                 break;
         }

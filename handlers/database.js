@@ -11,9 +11,10 @@ module.exports = async (client) => {
         name: "active",
         provider: provider,
         providerOptions: {
-            dataDir: "./settings/data/"
+            dataDir: "./settings/data"
         }
     });
+
 
     client.on("guildDelete", async (guild) => {
         if (!guild) return;
