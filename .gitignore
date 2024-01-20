@@ -1,11 +1,7 @@
-settings/.env
-
 package-lock.json
 
 node_modules/*
 
 .vscode/*
 
-settings/data/*
-
-settings/config.js
+settings/*
